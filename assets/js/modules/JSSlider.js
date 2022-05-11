@@ -1,18 +1,16 @@
 export default class JSSlider {
     constructor(imagesSelector = ".gallery__item", sliderRootSelector = ".js-slider") {
         this.imagesSelector = imagesSelector;
-        this.sliderRootSelector = sliderRootSelector
+        this.sliderRootSelector = sliderRootSelector;
+        this.interval = 0;
     }
     run() {
         this.imagesList = document.querySelectorAll(this.imagesSelector);
         this.sliderRootElement = document.querySelector(this.sliderRootSelector);
-
         // this.initEvents(this.imagesList, this.sliderRootElement);
         this.initEvents();
         // initCustomEvents(imagesList, sliderRootElement, imagesSelector);
         this.initCustomEvents();
-        this.addEventsToElements()
-
     }
 
     // initEvents(imagesList, sliderRootElement) {
@@ -22,23 +20,14 @@ export default class JSSlider {
                 this.fireCustomEvent(e.currentTarget, 'js-slider-img-click');
             });
         });
-    }
 
-    findElement(selector) {
-        return this.sliderRootElement.querySelector(selector);
-    }
-
-    launchEventAfterClickOnElement(element, event) {
-        element.addEventListener("click", () => this.fireCustomEvent(this.sliderRootElement, event))
-    }
-
-    addEventsToElements() {
         // todo: 
         // utwórz event o nazwie [click], który ma uruchomić event [js-slider-img-next]
         // na elemencie [.js-slider__nav--next]
         const navNext = this.findElement('.js-slider__nav--next');
         if (navNext) {
-            this.launchEventAfterClickOnElement(navNext, 'js-slider-img-next');
+            // this.launchCustomEventAfterInteraction(navNext, this.sliderRootElement, 'click', 'js-slider-img-next');
+            navNext.addEventListener("click", () => this.fireCustomEvent(this.sliderRootElement, 'js-slider-img-next'))
         }
 
         // todo:
@@ -46,7 +35,8 @@ export default class JSSlider {
         // na elemencie [.js-slider__nav--prev]
         const navPrev = this.findElement('.js-slider__nav--prev');
         if (navPrev) {
-            this.launchEventAfterClickOnElement(navPrev, 'js-slider-img-prev');
+            // this.launchCustomEventAfterInteraction(navPrev, this.sliderRootElement, 'click', 'js-slider-img-prev');
+            navPrev.addEventListener("click", () => this.fireCustomEvent(this.sliderRootElement, 'js-slider-img-prev'))
         }
 
         // todo:
@@ -62,6 +52,10 @@ export default class JSSlider {
         }
     }
 
+    findElement(selector) {
+        return this.sliderRootElement.querySelector(selector);
+    }
+
     fireCustomEvent(element, name) {
         console.log(element.className, '=>', name);
 
@@ -75,13 +69,15 @@ export default class JSSlider {
     initCustomEvents() {
         this.imagesList.forEach(img => {
             img.addEventListener('js-slider-img-click', event => {
-                this.onImageClick(event, this.sliderRootElement, this.imagesSelector);
+                // this.onImageClick(event, this.sliderRootElement, this.imagesSelector);
+                this.onImageClick(event);
+                // this.onStart()
             });
         });
-
         this.sliderRootElement.addEventListener('js-slider-img-next', this.onImageNext);
         this.sliderRootElement.addEventListener('js-slider-img-prev', this.onImagePrev);
         this.sliderRootElement.addEventListener('js-slider-close', this.onClose);
+
     }
 
     onImageClick(event) {
@@ -111,6 +107,7 @@ export default class JSSlider {
 
             document.querySelector('.js-slider__thumbs').appendChild(thumbElement);
         })
+        // this.onStart()
     }
 
     onImageNext() {
@@ -125,7 +122,10 @@ export default class JSSlider {
         // 5. podmienić atrybut src dla [.js-slider__image]
         const currentClassName = 'js-slider__thumbs-image--current';
         const current = this.querySelector(`.${currentClassName}`);
-
+        // console.log(current)
+        // if (!current) {
+        //     return
+        // }
         const parentCurrent = current.parentElement;
         const nextElement = parentCurrent.nextElementSibling;
         if (nextElement && !nextElement.className.includes('js-slider__thumbs-item--prototype')) {
@@ -135,6 +135,7 @@ export default class JSSlider {
             this.querySelector('.js-slider__image').src = img.src;
             current.classList.remove(currentClassName);
         }
+
     }
 
     onImagePrev() {
@@ -165,11 +166,20 @@ export default class JSSlider {
         // todo:
         // 1. należy usunać klasę [js-slider--active] dla [.js-slider]
         // 2. należy usunać wszystkie dzieci dla [.js-slider__thumbs] pomijając [.js-slider__thumbs-item--prototype]
-
         event.currentTarget.classList.remove('js-slider--active');
         const thumbsList = this.querySelectorAll('.js-slider__thumbs-item:not(.js-slider__thumbs-item--prototype)');
         thumbsList.forEach(item => item.parentElement.removeChild(item));
     }
+
+
+    onStart() {
+        this.interval = setInterval(() => {
+            this.fireCustomEvent(this.sliderRootElement, 'js-slider-img-next')
+        }, 1500)
+    }
+
+
+
 
 
 }

@@ -7,7 +7,7 @@ const init = function () {
     }); // za każdym przeładowaniem strony przydzielaj inną nazwę grupy dla zdjęcia
 
     // runJSSlider();
-    const jsSlider = new JSSlider();
+    const jsSlider = new JSSlider(".gallery__item");
     jsSlider.run()
 }
 // console.log(JSSlider);
